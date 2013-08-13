@@ -3,6 +3,10 @@ TVBundle.tv.MultiSelect = function(config) {
 
     this.id = config.id
 
+    this.availableItems = [];
+    this.selectedValuesStore = false;
+    this.availableValuesStore = false;
+
     this.prepareData(config.opts);
     this.createGrid(config);
 
@@ -36,15 +40,15 @@ TVBundle.tv.MultiSelect = function(config) {
 };
 Ext.extend(TVBundle.tv.MultiSelect,MODx.Panel,{
 
-    availableItems: []
-    ,selectedValuesStore:false
-    ,availableValuesStore: false
+//    availableItems: []
+//    ,selectedValuesStore:false
+//    ,availableValuesStore: false
 
     /**
      * Prepare data records (select options) for use
      * @param data
      */
-    ,prepareData: function(data){
+    prepareData: function(data){
 
         for(var k=0;k<data.length;k++){
             // Add to records record
@@ -80,6 +84,8 @@ Ext.extend(TVBundle.tv.MultiSelect,MODx.Panel,{
             ,fields: ['text','value']
             ,data: selected
         })
+
+        console.log(this.selectedValuesStore);
     }
 
 
@@ -94,6 +100,7 @@ Ext.extend(TVBundle.tv.MultiSelect,MODx.Panel,{
             ,store: this.selectedValuesStore
             ,fields: ['text','value','selected']
             ,tv: this
+            ,id: this.id + '-grid'
             ,columns: [{
                 header: 'ONE',
                 dataIndex: 'text'
@@ -137,6 +144,8 @@ Ext.extend(TVBundle.tv.MultiSelect,MODx.Panel,{
 
     ,_onGridRender: function(){
         var grid = this.grid;
+
+        console.log(grid);
         // Set up dd target
         var ddrow = new Ext.dd.DropTarget(this.grid.getView().mainBody, {
             ddGroup : this.id+'-dd'
