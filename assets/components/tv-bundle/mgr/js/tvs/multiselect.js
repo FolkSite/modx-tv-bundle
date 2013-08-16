@@ -6,11 +6,10 @@ TVBundle.tv.MultiSelect = function(config) {
     this.availableItems = [];
     this.selectedValuesStore = false;
     this.availableValuesStore = false;
+    this.tvField = document.getElementById(config.id);
 
     this.prepareData(config.opts);
     this.createGrid(config);
-
-    this.tvField = document.getElementById(config.id);
 
     //noinspection JSValidateTypes
     Ext.apply(config,{
@@ -62,11 +61,11 @@ Ext.extend(TVBundle.tv.MultiSelect,MODx.Panel,{
         for(var k=0;k<this.availableItems.length;k++){
             var item = this.availableItems[k];
 
-            if(item.selected){
-                selected.push([item.text,item.value]);
-            } else {
+      //      if(item.selected){
+      //          selected.push([item.text,item.value]);
+      //      } else {
                 records.push([item.selected,item.text,item.value]);
-            }
+      //      }
         }
         this.availableValuesStore = new Ext.data.ArrayStore({
             storeId: this.id+'-store'
@@ -81,11 +80,22 @@ Ext.extend(TVBundle.tv.MultiSelect,MODx.Panel,{
 
         this.selectedValuesStore = new Ext.data.ArrayStore({
             storeId: this.id+'-selected-store'
-            ,fields: ['text','value']
-            ,data: selected
-        })
+            ,fields: ['selected','text','value']
+            ,data: []
+        });
 
-        console.log(this.selectedValuesStore);
+
+        selectedIds = this.tvField.value.split('||')
+        for(var k=0;k<selectedIds.length;k++){
+            var value = selectedIds[k];
+            var index = this.availableValuesStore.findExact('value',value);
+            if(index>=0){
+                var record = this.availableValuesStore.getAt(index);
+                this.availableValuesStore.remove(record);
+                this.selectedValuesStore.add(record);
+
+            }
+        }
     }
 
 
@@ -137,7 +147,7 @@ Ext.extend(TVBundle.tv.MultiSelect,MODx.Panel,{
         });
 
 
-        this.availableValuesStore.filter('selected',1);
+    //    this.availableValuesStore.filter('selected',1);
     }
 
 
@@ -145,12 +155,12 @@ Ext.extend(TVBundle.tv.MultiSelect,MODx.Panel,{
     ,_onGridRender: function(){
         var grid = this.grid;
 
-        console.log(grid);
         // Set up dd target
         var ddrow = new Ext.dd.DropTarget(this.grid.getView().mainBody, {
             ddGroup : this.id+'-dd'
             ,copy: false
             ,notifyDrop : function(tv){ return function(dd, e, data){
+                console.log('DROP');
                 var grid = tv.grid
                 var sm = grid.getSelectionModel();
                 var rows = sm.getSelections();
